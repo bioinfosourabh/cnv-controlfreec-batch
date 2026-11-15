@@ -1,0 +1,4 @@
+# Targeted (exome-style) mode without BAF.
+capture_bed: tests/data/targets.bed
+snp_vcf: null
+freec_set: CONTAMINATION=0.25

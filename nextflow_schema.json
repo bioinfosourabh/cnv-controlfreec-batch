@@ -1,0 +1,190 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://raw.githubusercontent.com/bioinfosourabh/cnv-controlfreec-batch/main/nextflow_schema.json",
+    "title": "cnv-controlfreec-batch pipeline parameters",
+    "description": "Control-FREEC copy-number calling for many samples from one sample sheet",
+    "type": "object",
+    "$defs": {
+        "input_output_options": {
+            "title": "Input/output options",
+            "type": "object",
+            "required": [
+                "input",
+                "outdir"
+            ],
+            "properties": {
+                "input": {
+                    "type": "string",
+                    "description": "Sample sheet CSV: sample_id,tumor_bam,normal_bam,sex plus optional per-sample placeholder columns.",
+                    "format": "file-path",
+                    "pattern": "^\\S+\\.csv$"
+                },
+                "outdir": {
+                    "type": "string",
+                    "description": "Output directory.",
+                    "format": "directory-path"
+                },
+                "publish_dir_mode": {
+                    "type": "string",
+                    "description": "How result files are published.",
+                    "default": "copy",
+                    "enum": [
+                        "symlink",
+                        "rellink",
+                        "link",
+                        "copy",
+                        "copyNoFollow",
+                        "move"
+                    ]
+                }
+            }
+        },
+        "reference_options": {
+            "title": "Reference options",
+            "type": "object",
+            "required": [
+                "fasta"
+            ],
+            "properties": {
+                "fasta": {
+                    "type": "string",
+                    "description": "Reference FASTA the BAMs were aligned to.",
+                    "format": "file-path"
+                },
+                "fasta_fai": {
+                    "type": "string",
+                    "description": "FASTA index; looked for next to the FASTA if not given.",
+                    "format": "file-path"
+                },
+                "chr_len": {
+                    "type": "string",
+                    "description": "Chromosome length file (chrLenFile). Built from the FASTA index if not given.",
+                    "format": "file-path"
+                },
+                "chr_files": {
+                    "type": "string",
+                    "description": "Directory of per-chromosome FASTA files (chrFiles). Built from the FASTA if not given.",
+                    "format": "directory-path"
+                },
+                "contig_regex": {
+                    "type": "string",
+                    "description": "Contigs kept when building chr_len and chr_files.",
+                    "default": "^(chr)?([0-9]+|X|Y)$"
+                },
+                "capture_bed": {
+                    "type": "string",
+                    "description": "Capture regions BED for exome/panel data. Leave empty for whole-genome data.",
+                    "format": "file-path"
+                },
+                "snp_vcf": {
+                    "type": "string",
+                    "description": "SNP positions (VCF, bgzipped with .tbi) for B-allele frequency and genotype calls. BAF is not computed when empty.",
+                    "format": "file-path"
+                },
+                "mappability": {
+                    "type": "string",
+                    "description": "Optional GEM mappability file (gemMappabilityFile).",
+                    "format": "file-path"
+                }
+            }
+        },
+        "freec_options": {
+            "title": "Control-FREEC options",
+            "type": "object",
+            "properties": {
+                "template": {
+                    "type": "string",
+                    "description": "Config template with {{NAME}} placeholders.",
+                    "format": "file-path"
+                },
+                "freec_set": {
+                    "type": "string",
+                    "description": "Comma-separated NAME=VALUE pairs that override template placeholders for all samples, e.g. WINDOW=50000,CONTAMINATION=0.3."
+                },
+                "freec_threads": {
+                    "type": "integer",
+                    "description": "maxThreads for each FREEC run (also its CPU request).",
+                    "default": 4,
+                    "minimum": 1
+                },
+                "freec_container": {
+                    "type": "string",
+                    "description": "Container image for FREEC.",
+                    "default": "quay.io/biocontainers/control-freec:11.6b--hde5307d_3"
+                }
+            }
+        },
+        "postprocessing_options": {
+            "title": "Post-processing",
+            "type": "object",
+            "properties": {
+                "run_significance": {
+                    "type": "boolean",
+                    "description": "Run assess_significance.R (Wilcoxon and Kolmogorov-Smirnov p-values per CNV).",
+                    "default": true
+                },
+                "run_plots": {
+                    "type": "boolean",
+                    "description": "Run makeGraph2.0.R.",
+                    "default": true
+                },
+                "run_export": {
+                    "type": "boolean",
+                    "description": "Write BED and Circos tracks (freec2bed.pl, freec2circos.pl).",
+                    "default": true
+                },
+                "alpha": {
+                    "type": "number",
+                    "description": "P-value threshold used to flag significant CNVs in the cohort table.",
+                    "default": 0.05
+                },
+                "skip_multiqc": {
+                    "type": "boolean",
+                    "description": "Do not run MultiQC.",
+                    "default": false
+                },
+                "save_reference": {
+                    "type": "boolean",
+                    "description": "Publish the chromosome length file and per-chromosome FASTAs built by the pipeline.",
+                    "default": false
+                }
+            }
+        },
+        "infrastructure_options": {
+            "title": "Infrastructure options",
+            "type": "object",
+            "properties": {
+                "awsqueue": {
+                    "type": "string",
+                    "description": "AWS Batch job queue (awsbatch profile)."
+                },
+                "awsregion": {
+                    "type": "string",
+                    "description": "AWS region (awsbatch profile).",
+                    "default": "eu-west-2"
+                },
+                "awscli": {
+                    "type": "string",
+                    "description": "Path to the AWS CLI on the Batch compute AMI (awsbatch profile)."
+                }
+            }
+        }
+    },
+    "allOf": [
+        {
+            "$ref": "#/$defs/input_output_options"
+        },
+        {
+            "$ref": "#/$defs/reference_options"
+        },
+        {
+            "$ref": "#/$defs/freec_options"
+        },
+        {
+            "$ref": "#/$defs/postprocessing_options"
+        },
+        {
+            "$ref": "#/$defs/infrastructure_options"
+        }
+    ]
+}

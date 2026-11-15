@@ -1,0 +1,23 @@
+# Settings for bin/run_controlfreec_batch.sh (sourced as Bash).
+# Copy to freec_batch.conf and fill in the paths for your system.
+
+# Control-FREEC binary and the directory with its helper scripts
+# (assess_significance.R, makeGraph2.0.R, freec2bed.pl, freec2circos.pl).
+# Leave FREEC_SCRIPTS_DIR empty if the scripts are on PATH (e.g. conda install).
+FREEC_BIN="freec"
+FREEC_SCRIPTS_DIR=""
+
+# Reference files
+CHR_LEN_FILE="/path/to/hg38.len"          # cut -f1,2 hg38.fa.fai (main chromosomes only)
+CHR_FILES="/path/to/hg38_chromosomes/"    # one FASTA per chromosome, named like the contigs
+FASTA="/path/to/hg38.fa"                  # needed for BAF
+SNP_FILE="/path/to/common_snps.vcf.gz"    # SNP positions for BAF; leave empty to skip BAF
+CAPTURE_BED="/path/to/exome_targets.bed"  # exome/panel targets; leave empty for WGS
+MAPPABILITY=""                            # optional GEM mappability file
+
+THREADS=4
+RUN_POSTPROCESS=true
+
+# Any template placeholder can be overridden here, e.g. 50 kb windows for WGS:
+# EXTRA_SET=(WINDOW=50000 CONTAMINATION=0.3)
+EXTRA_SET=()

@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  python:
+    name: pytest (Python ${{ matrix.python }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.9", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: pip install pytest
+      - run: python -m pytest -v tests
+
+  shellcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install shellcheck-py
+      - run: shellcheck bin/*.sh
+
+  nextflow:
+    name: nextflow lint + stub run
+    runs-on: ubuntu-latest
+    env:
+      NXF_VER: "25.10.4"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: nf-core/setup-nextflow@v2
+        with:
+          version: ${{ env.NXF_VER }}
+      - run: nextflow lint .
+      - name: Stub run (whole-genome, BAF)
+        run: nextflow run . -profile test -stub-run --outdir results
+      - name: Stub run (targeted, no BAF)
+        run: |
+          nextflow run . -profile test -stub-run --outdir results_wes -params-file tests/params/wes_no_baf.yml
+      - name: Check outputs
+        run: |
+          test -s results/configs/S1.config.txt
+          grep -q '^\[control\]' results/configs/S1.config.txt
+          ! grep -q '^\[control\]' results/configs/S2.config.txt
+          grep -q '^\[target\]' results_wes/configs/S1.config.txt
+          test -s results/cohort/cohort_cnv_summary.tsv

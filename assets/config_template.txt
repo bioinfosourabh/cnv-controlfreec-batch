@@ -1,0 +1,64 @@
+# Control-FREEC configuration template
+#
+# bin/make_freec_configs.py fills the {{NAME}} placeholders for each sample
+# from the sample sheet (any column, upper-cased), from --set NAME=VALUE
+# options, or from built-in defaults that depend on the analysis mode.
+#
+#  - A line whose placeholders resolve to an empty value is left out.
+#  - A section header followed by "#@requires NAME" is left out, with all of
+#    its lines, when NAME is empty: [control] for tumour-only samples,
+#    [BAF] when no SNP file is given, [target] for whole-genome data.
+#
+# The fixed values below are the exome tumour-normal settings this
+# repository was built around; change them here or override them per run.
+
+[general]
+chrLenFile = {{CHR_LEN_FILE}}
+chrFiles = {{CHR_FILES}}
+gemMappabilityFile = {{MAPPABILITY}}
+ploidy = {{PLOIDY}}
+sex = {{SEX}}
+samtools = {{SAMTOOLS}}
+bedtools = {{BEDTOOLS}}
+sambamba = {{SAMBAMBA}}
+SambambaThreads = {{SAMBAMBA_THREADS}}
+maxThreads = {{THREADS}}
+outputDir = {{OUTPUT_DIR}}
+window = {{WINDOW}}
+step = {{STEP}}
+minCNAlength = 3
+breakPointThreshold = 0.6
+breakPointType = 2
+coefficientOfVariation = 0.05
+noisyData = {{NOISY_DATA}}
+contaminationAdjustment = TRUE
+contamination = {{CONTAMINATION}}
+degree = {{DEGREE}}
+intercept = {{INTERCEPT}}
+readCountThreshold = {{READ_COUNT_THRESHOLD}}
+telocentromeric = 50000
+printNA = FALSE
+BedGraphOutput = TRUE
+
+[sample]
+mateFile = {{TUMOR_BAM}}
+inputFormat = BAM
+mateOrientation = FR
+
+[control]
+#@requires NORMAL_BAM
+mateFile = {{NORMAL_BAM}}
+inputFormat = BAM
+mateOrientation = FR
+
+[BAF]
+#@requires SNP_FILE
+SNPfile = {{SNP_FILE}}
+makePileup = {{SNP_POSITIONS}}
+fastaFile = {{FASTA}}
+minimalCoveragePerPosition = 5
+shiftInQuality = 33
+
+[target]
+#@requires CAPTURE_BED
+captureRegions = {{CAPTURE_BED}}

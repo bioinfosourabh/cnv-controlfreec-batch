@@ -1,0 +1,3 @@
+sample_id,tumor_bam,normal_bam,sex
+S1,../tests/data/S1_SO.bam,../tests/data/S1_GL.bam,XX
+S2,../tests/data/S2_SO.bam,,XX

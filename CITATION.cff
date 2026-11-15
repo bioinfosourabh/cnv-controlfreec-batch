@@ -1,0 +1,31 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below, and cite Control-FREEC (Boeva et al. 2012)."
+title: "cnv-controlfreec-batch: sample-sheet-driven Control-FREEC copy-number calling"
+type: software
+authors:
+  - family-names: Kumar
+    given-names: Sourabh
+    email: bioinfosourabh@gmail.com
+    orcid: "https://orcid.org/0009-0009-5840-9830"
+repository-code: "https://github.com/bioinfosourabh/cnv-controlfreec-batch"
+license: MIT
+version: 1.0.0
+date-released: 2026-11-15
+keywords:
+  - copy number variation
+  - Control-FREEC
+  - nextflow
+  - exome
+references:
+  - type: article
+    title: "Control-FREEC: a tool for assessing copy number and allelic content using next-generation sequencing data"
+    authors:
+      - family-names: Boeva
+        given-names: Valentina
+    journal: Bioinformatics
+    volume: 28
+    issue: 3
+    start: 423
+    end: 425
+    year: 2012
+    doi: 10.1093/bioinformatics/btr670
